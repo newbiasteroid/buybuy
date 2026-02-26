@@ -1,72 +1,164 @@
-<button onclick="triggerNewItem()" id="addBtn" class="bg-indigo-600 text-white w-12 h-12 rounded-full shadow-lg text-2xl flex items-center justify-center">
-    <span>+</span>
-</button>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BuyBuy App v2.1</title>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .comparing { border: 4px solid #f97316 !important; background-color: #fff7ed; }
+        .ghost { opacity: 0.2; background: #cbd5e1; }
+        * { -webkit-touch-callout: none; -webkit-user-select: none; }
+        input, textarea { -webkit-user-select: text; }
+    </style>
+</head>
+<body class="bg-slate-50 pb-24">
+
+<div class="p-4">
+    <header class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-extrabold text-slate-800">BuyBuy</h1>
+        <button id="addBtn" class="bg-indigo-600 text-white w-12 h-12 rounded-full shadow-lg text-2xl flex items-center justify-center">+</button>
+    </header>
+    <div id="productList" class="grid grid-cols-1 gap-4"></div>
+</div>
+
+<input type="file" id="cameraInput" accept="image/*" capture="camera" style="display:none;">
+
+<div id="editModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-end sm:items-center justify-center">
+    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-2xl p-6">
+        <div class="flex justify-between mb-4"><h2 class="text-xl font-bold">商品詳情</h2><button id="closeEditBtn" class="text-gray-400 text-2xl">&times;</button></div>
+        <div class="space-y-4">
+            <input id="editName" type="text" placeholder="名稱" class="w-full border-b p-2">
+            <input id="editPrice" type="number" placeholder="價錢" class="w-full border-b p-2">
+            <input id="editTags" type="text" placeholder="Tags" class="w-full border-b p-2">
+            <textarea id="editNote" placeholder="備註" class="w-full border-b p-2"></textarea>
+            <button id="saveEditBtn" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold">儲存</button>
+            <button id="deleteBtn" class="w-full text-red-500 py-2 text-sm">刪除</button>
+        </div>
+    </div>
+</div>
+
+<div id="compareBar" class="fixed bottom-6 left-4 right-4 bg-white border shadow-2xl rounded-2xl p-4 hidden flex justify-between items-center z-40">
+    <span id="compareCount" class="font-bold text-orange-600">已選 0 / 2</span>
+    <button id="startCompareBtn" class="bg-orange-500 text-white px-6 py-2 rounded-xl font-bold">VS 比較</button>
+</div>
+
+<div id="compareModal" class="fixed inset-0 bg-slate-900/95 hidden z-[60] p-4 flex items-center justify-center">
+    <div class="bg-white w-full max-w-md rounded-3xl p-6">
+        <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold">Battle</h2><button id="closeCompareBtn" class="text-3xl">&times;</button></div>
+        <div id="compareFlex" class="flex gap-4 items-start"></div>
+    </div>
+</div>
 
 <script>
-    // 在最前面加上這段除錯檢查
-    window.onerror = function(msg, url, linenumber) {
-        alert('錯誤訊息: ' + msg + '\n行號: ' + linenumber);
-        return true;
-    };
-
+// 核心：等待 DOM 載入完畢才執行
+document.addEventListener('DOMContentLoaded', function() {
     let items = JSON.parse(localStorage.getItem('buybuy_v2')) || [];
     let selectedIds = [];
     let currentEditId = null;
 
-    const listEl = document.getElementById('productList');
+    // 抓取所有元件
+    const addBtn = document.getElementById('addBtn');
     const camInput = document.getElementById('cameraInput');
+    const listEl = document.getElementById('productList');
 
-    // 重新編寫的新增函數，增加穩定性
-    function triggerNewItem() {
-        console.log("按鈕被點擊了");
-        try {
-            const fileInput = document.getElementById('cameraInput');
-            if (!fileInput) {
-                alert("找不到相機輸入元件");
-                return;
-            }
-            fileInput.click();
-        } catch (err) {
-            alert("觸發失敗: " + err);
-        }
+    // 渲染函數
+    function render() {
+        listEl.innerHTML = items.map(i => `
+            <div data-id="${i.id}" class="bg-white rounded-2xl shadow-sm border-2 overflow-hidden flex items-stretch ${selectedIds.includes(i.id) ? 'comparing' : 'border-transparent'}">
+                <div class="drag-handle w-10 flex items-center justify-center bg-slate-50 border-r text-slate-300">⋮⋮</div>
+                <img src="${i.img}" onclick="window.openEdit('${i.id}')" class="w-24 h-24 object-cover">
+                <div class="flex-1 p-3 flex flex-col justify-center" onclick="window.toggleSelect('${i.id}')">
+                    <h3 class="font-bold text-slate-800">${i.name}</h3>
+                    <p class="text-rose-500 font-black">$${i.price}</p>
+                </div>
+            </div>
+        `).join('');
+        
+        const bar = document.getElementById('compareBar');
+        document.getElementById('compareCount').innerText = `已選 ${selectedIds.length} / 2`;
+        selectedIds.length > 0 ? bar.classList.remove('hidden') : bar.classList.add('hidden');
     }
 
-    // 處理檔案選取與相機拍照
-    document.getElementById('cameraInput').onchange = function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // 顯示讀取中，避免大圖片造成當機感
-        const originalText = document.getElementById('addBtn').innerHTML;
-        document.getElementById('addBtn').innerHTML = "⏳";
-
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const newItem = {
-                id: Date.now().toString(),
-                name: "新商品 " + (items.length + 1),
-                price: "0",
-                date: new Date().toLocaleDateString(),
-                tags: ["清單"],
-                note: "",
-                img: event.target.result // Base64 格式
-            };
-            
-            items.unshift(newItem);
-            save();
-            render();
-            document.getElementById('addBtn').innerHTML = originalText;
-            
-            // 自動開啟編輯視窗
-            setTimeout(() => openEdit(newItem.id), 300);
-        };
-        
-        reader.onerror = function() {
-            alert("讀取圖片失敗");
-        };
-        
-        reader.readAsDataURL(file);
+    // 將函數掛載到 window 讓 HTML 裡的 onclick 能抓到
+    window.openEdit = function(id) {
+        currentEditId = id;
+        const item = items.find(i => i.id === id);
+        document.getElementById('editName').value = item.name;
+        document.getElementById('editPrice').value = item.price;
+        document.getElementById('editTags').value = item.tags.join(',');
+        document.getElementById('editNote').value = item.note;
+        document.getElementById('editModal').classList.remove('hidden');
     };
 
-    // ... 其餘的 render, save, openEdit 等函數保持不變 ...
+    window.toggleSelect = function(id) {
+        if (selectedIds.includes(id)) {
+            selectedIds = selectedIds.filter(i => i !== id);
+        } else if (selectedIds.length < 2) {
+            selectedIds.push(id);
+        }
+        render();
+    };
+
+    // 事件監聽
+    addBtn.addEventListener('click', () => camInput.click());
+
+    camInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const newItem = {
+                id: Date.now().toString(),
+                name: "新商品",
+                price: "0",
+                tags: [],
+                note: "",
+                img: event.target.result
+            };
+            items.unshift(newItem);
+            localStorage.setItem('buybuy_v2', JSON.stringify(items));
+            render();
+            window.openEdit(newItem.id);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    document.getElementById('saveEditBtn').onclick = () => {
+        const idx = items.findIndex(i => i.id === currentEditId);
+        items[idx].name = document.getElementById('editName').value;
+        items[idx].price = document.getElementById('editPrice').value;
+        items[idx].tags = document.getElementById('editTags').value.split(',');
+        items[idx].note = document.getElementById('editNote').value;
+        localStorage.setItem('buybuy_v2', JSON.stringify(items));
+        render();
+        document.getElementById('editModal').classList.add('hidden');
+    };
+
+    document.getElementById('closeEditBtn').onclick = () => document.getElementById('editModal').classList.add('hidden');
+    
+    document.getElementById('startCompareBtn').onclick = () => {
+        const compareItems = items.filter(i => selectedIds.includes(i.id));
+        document.getElementById('compareFlex').innerHTML = compareItems.map(i => `
+            <div class="flex-1 text-center">
+                <img src="${i.img}" class="rounded-xl w-full aspect-square object-cover mb-2 border">
+                <p class="font-bold">${i.name}</p>
+                <p class="text-rose-500 font-black">$${i.price}</p>
+            </div>
+        `).join('<div class="self-center font-bold text-slate-300">VS</div>');
+        document.getElementById('compareModal').classList.remove('hidden');
+    };
+
+    document.getElementById('closeCompareBtn').onclick = () => {
+        document.getElementById('compareModal').classList.add('hidden');
+        selectedIds = [];
+        render();
+    };
+
+    // 初始化渲染
+    render();
+});
 </script>
+</body>
+</html>
