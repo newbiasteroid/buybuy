@@ -8,606 +8,192 @@
 <title>BuyBuy</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
-
-  :root {
-    --bg: #F5F0E8;
-    --surface: #FFFDF7;
-    --card: #FFFFFF;
-    --ink: #1A1208;
-    --ink2: #5C4F38;
-    --ink3: #A09078;
-    --accent: #D4541A;
-    --accent2: #F2A65A;
-    --green: #2D7A4F;
-    --border: #E8E0D0;
-    --shadow: 0 2px 16px rgba(26,18,8,0.10);
-    --shadow-lg: 0 8px 40px rgba(26,18,8,0.16);
-    --r: 16px;
-    --r-sm: 10px;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    min-height: 100dvh;
-    overflow-x: hidden;
-  }
-
+  :root{--bg:#F5F0E8;--surface:#FFFDF7;--card:#fff;--ink:#1A1208;--ink2:#5C4F38;--ink3:#A09078;--accent:#D4541A;--green:#2D7A4F;--border:#E8E0D0;--shadow:0 2px 16px rgba(26,18,8,.10);--r:16px;--rsm:10px}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100dvh;overflow-x:hidden}
   /* HEADER */
-  .header {
-    background: var(--surface);
-    border-bottom: 1.5px solid var(--border);
-    padding: 0 20px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .logo {
-    font-family: 'Fraunces', serif;
-    font-size: 26px;
-    font-weight: 900;
-    color: var(--accent);
-    letter-spacing: -1px;
-  }
-  .logo span { color: var(--ink); }
-  .header-actions { display: flex; gap: 10px; align-items: center; }
-
-  .btn-icon {
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-    transition: background 0.15s;
-    color: var(--ink);
-  }
-  .btn-icon:active { background: var(--border); }
-  .btn-icon.compare-active { background: var(--accent); color: white; }
-
+  .header{background:var(--surface);border-bottom:1.5px solid var(--border);padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .logo{font-family:'Fraunces',serif;font-size:26px;font-weight:900;color:var(--accent);letter-spacing:-1px}
+  .logo span{color:var(--ink)}
+  .btn-icon{width:40px;height:40px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--ink)}
+  .btn-icon:active{background:var(--border)}
+  .btn-icon.compare-active{background:var(--accent);color:#fff}
+  /* TAG FILTER BAR */
+  .filter-bar{background:var(--surface);border-bottom:1.5px solid var(--border);padding:10px 16px;display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:60px;z-index:99}
+  .filter-bar::-webkit-scrollbar{display:none}
+  .filter-chip{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--ink2);cursor:pointer;transition:all .15s;white-space:nowrap}
+  .filter-chip:active{transform:scale(.95)}
+  .filter-chip.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .filter-chip.all-chip{font-weight:600}
+  .filter-count{font-size:11px;opacity:.75;margin-left:3px}
   /* MAIN */
-  .main { padding: 20px 16px 100px; }
-
-  .section-title {
-    font-family: 'Fraunces', serif;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--ink3);
-    margin-bottom: 14px;
-  }
-
+  .main{padding:16px 16px 100px}
+  .section-title{font-family:'Fraunces',serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .filter-result-label{font-size:12px;color:var(--ink3)}
   /* GRID */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-  }
-
-  /* PRODUCT CARD */
-  .card {
-    background: var(--card);
-    border-radius: var(--r);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    cursor: pointer;
-    transition: transform 0.18s, box-shadow 0.18s;
-    position: relative;
-    border: 1.5px solid transparent;
-    user-select: none;
-  }
-  .card:active { transform: scale(0.97); }
-  .card.selected-compare {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(212,84,26,0.18), var(--shadow);
-  }
-  .card.dragging { opacity: 0.5; transform: scale(0.95); }
-
-  .card-img {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    display: block;
-    background: var(--bg);
-  }
-  .card-img-placeholder {
-    width: 100%;
-    aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 52px;
-    background: linear-gradient(135deg, #F5F0E8 0%, #EDE5D4 100%);
-  }
-  .card-body { padding: 12px; }
-  .card-name {
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 1.3;
-    margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .card-price {
-    font-family: 'Fraunces', serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--accent);
-  }
-  .card-price span { font-size: 12px; font-weight: 400; color: var(--ink3); font-family: 'DM Sans', sans-serif; }
-  .card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
-  .tag {
-    font-size: 10px;
-    font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 20px;
-    background: var(--bg);
-    color: var(--ink2);
-    border: 1px solid var(--border);
-  }
-  .compare-badge {
-    position: absolute;
-    top: 8px; right: 8px;
-    background: var(--accent);
-    color: white;
-    width: 24px; height: 24px;
-    border-radius: 50%;
-    font-size: 13px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    box-shadow: 0 2px 8px rgba(212,84,26,0.3);
-  }
-  .card.selected-compare .compare-badge { display: flex; }
-
-  /* EMPTY STATE */
-  .empty {
-    grid-column: 1/-1;
-    text-align: center;
-    padding: 60px 20px;
-  }
-  .empty-icon { font-size: 56px; margin-bottom: 16px; }
-  .empty-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; margin-bottom: 8px; }
-  .empty-sub { color: var(--ink3); font-size: 14px; }
-
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  /* CARD */
+  .card{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .18s;position:relative;border:2px solid transparent;user-select:none}
+  .card:active{transform:scale(.97)}
+  .card.selected-compare{border-color:var(--accent);box-shadow:0 0 0 3px rgba(212,84,26,.18),var(--shadow)}
+  .card-img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:var(--bg)}
+  .card-img-ph{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:52px;background:linear-gradient(135deg,#F5F0E8,#EDE5D4)}
+  .card-body{padding:12px}
+  .card-name{font-weight:600;font-size:14px;line-height:1.3;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .card-price{font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:var(--accent)}
+  .cur-badge{font-size:10px;font-weight:600;background:var(--bg);color:var(--ink3);padding:1px 5px;border-radius:4px;margin-left:3px;font-family:'DM Sans',sans-serif;vertical-align:middle}
+  .card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+  .tag{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;background:var(--bg);color:var(--ink2);border:1px solid var(--border)}
+  .cmp-badge{position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;width:24px;height:24px;border-radius:50%;font-size:13px;display:none;align-items:center;justify-content:center;font-weight:700;box-shadow:0 2px 8px rgba(212,84,26,.3)}
+  .card.selected-compare .cmp-badge{display:flex}
+  /* EMPTY */
+  .empty{grid-column:1/-1;text-align:center;padding:60px 20px}
+  .empty-icon{font-size:56px;margin-bottom:16px}
+  .empty-title{font-family:'Fraunces',serif;font-size:22px;font-weight:700;margin-bottom:8px}
+  .empty-sub{color:var(--ink3);font-size:14px}
   /* FAB */
-  .fab {
-    position: fixed;
-    bottom: 28px; right: 20px;
-    width: 58px; height: 58px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: white;
-    border: none;
-    font-size: 28px;
-    cursor: pointer;
-    box-shadow: 0 4px 20px rgba(212,84,26,0.4);
-    display: flex; align-items: center; justify-content: center;
-    transition: transform 0.15s, box-shadow 0.15s;
-    z-index: 99;
-  }
-  .fab:active { transform: scale(0.93); box-shadow: 0 2px 10px rgba(212,84,26,0.3); }
-
+  .fab{position:fixed;bottom:28px;right:20px;width:58px;height:58px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:28px;cursor:pointer;box-shadow:0 4px 20px rgba(212,84,26,.4);display:flex;align-items:center;justify-content:center;transition:transform .15s;z-index:99}
+  .fab:active{transform:scale(.93)}
   /* MODAL */
-  .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(26,18,8,0.5);
-    backdrop-filter: blur(4px);
-    z-index: 200;
-    display: flex;
-    align-items: flex-end;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s;
-  }
-  .modal-overlay.open { opacity: 1; pointer-events: all; }
-
-  .modal {
-    background: var(--surface);
-    border-radius: 24px 24px 0 0;
-    width: 100%;
-    max-height: 92dvh;
-    overflow-y: auto;
-    padding: 0 0 40px;
-    transform: translateY(100%);
-    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-  }
-  .modal-overlay.open .modal { transform: translateY(0); }
-
-  .modal-handle {
-    width: 40px; height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    margin: 12px auto 0;
-  }
-  .modal-header {
-    padding: 20px 20px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .modal-title {
-    font-family: 'Fraunces', serif;
-    font-size: 22px;
-    font-weight: 700;
-  }
-  .modal-close {
-    background: var(--bg);
-    border: none;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    font-size: 18px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--ink2);
-  }
-
-  .form { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
-
-  .form-group { display: flex; flex-direction: column; gap: 6px; }
-  .form-label { font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--ink3); }
-  .form-input {
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    border-radius: var(--r-sm);
-    padding: 12px 14px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    color: var(--ink);
-    outline: none;
-    transition: border-color 0.15s;
-    width: 100%;
-  }
-  .form-input:focus { border-color: var(--accent); }
-  textarea.form-input { resize: vertical; min-height: 80px; }
-
-  /* IMAGE PICKER */
-  .img-picker { display: flex; flex-direction: column; gap: 12px; }
-  .img-preview-wrap {
-    width: 100%;
-    aspect-ratio: 2/1;
-    border-radius: var(--r-sm);
-    background: var(--bg);
-    border: 2px dashed var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-  }
-  .img-preview { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .img-preview-placeholder { font-size: 40px; }
-  .img-preview-icon-large { font-size: 64px; }
-
-  .img-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .img-option-btn {
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    border-radius: var(--r-sm);
-    padding: 12px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ink);
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
-    transition: border-color 0.15s, background 0.15s;
-  }
-  .img-option-btn:active { background: var(--border); }
-  .img-option-btn span:first-child { font-size: 24px; }
-
-  /* EMOJI PICKER */
-  .emoji-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 8px;
-  }
-  .emoji-btn {
-    aspect-ratio: 1;
-    border: 1.5px solid var(--border);
-    border-radius: var(--r-sm);
-    background: var(--bg);
-    font-size: 28px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: border-color 0.15s, transform 0.1s;
-  }
-  .emoji-btn:active { transform: scale(0.9); }
-  .emoji-btn.selected { border-color: var(--accent); background: rgba(212,84,26,0.08); }
-
-  /* TAG INPUT */
-  .tag-input-wrap {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    border-radius: var(--r-sm);
-    padding: 8px 10px;
-    min-height: 46px;
-    align-items: center;
-    cursor: text;
-  }
-  .tag-input-wrap:focus-within { border-color: var(--accent); }
-  .tag-pill {
-    font-size: 12px;
-    font-weight: 500;
-    padding: 3px 10px;
-    border-radius: 20px;
-    background: var(--accent);
-    color: white;
-    display: flex; align-items: center; gap: 4px;
-  }
-  .tag-pill button { background: none; border: none; color: white; font-size: 14px; cursor: pointer; line-height: 1; padding: 0 0 0 2px; }
-  .tag-input-field {
-    background: none;
-    border: none;
-    outline: none;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--ink);
-    min-width: 60px;
-    flex: 1;
-  }
-
-  /* DETAIL MODAL */
-  .detail-img {
-    width: 100%;
-    aspect-ratio: 4/3;
-    object-fit: cover;
-  }
-  .detail-img-placeholder {
-    width: 100%;
-    aspect-ratio: 4/3;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 80px;
-    background: linear-gradient(135deg, #F5F0E8, #EDE5D4);
-  }
-  .detail-body { padding: 20px; }
-  .detail-name {
-    font-family: 'Fraunces', serif;
-    font-size: 26px;
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: 4px;
-  }
-  .detail-date { font-size: 12px; color: var(--ink3); margin-bottom: 16px; }
-  .detail-price {
-    font-family: 'Fraunces', serif;
-    font-size: 36px;
-    font-weight: 900;
-    color: var(--accent);
-    margin-bottom: 16px;
-  }
-  .detail-section { margin-bottom: 16px; }
-  .detail-section-label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink3); margin-bottom: 6px; }
-  .detail-desc { font-size: 14px; color: var(--ink2); line-height: 1.6; }
-  .detail-url { font-size: 13px; color: var(--accent); text-decoration: none; word-break: break-all; }
-  .detail-actions { display: flex; gap: 10px; padding: 0 20px 0; }
-  .btn-primary {
-    flex: 1;
-    padding: 14px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: var(--r-sm);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.15s;
-  }
-  .btn-primary:active { opacity: 0.8; }
-  .btn-secondary {
-    flex: 1;
-    padding: 14px;
-    background: var(--bg);
-    color: var(--ink);
-    border: 1.5px solid var(--border);
-    border-radius: var(--r-sm);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .btn-danger {
-    flex: 1;
-    padding: 14px;
-    background: #FFF0EE;
-    color: #C0392B;
-    border: 1.5px solid #FADADD;
-    border-radius: var(--r-sm);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  /* COMPARE PANEL */
-  .compare-bar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: var(--surface);
-    border-top: 2px solid var(--accent);
-    padding: 12px 16px 28px;
-    z-index: 98;
-    transform: translateY(100%);
-    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-    box-shadow: 0 -4px 30px rgba(212,84,26,0.12);
-  }
-  .compare-bar.visible { transform: translateY(0); }
-  .compare-bar-title { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
-  .compare-slots { display: flex; gap: 10px; margin-bottom: 12px; }
-  .compare-slot {
-    flex: 1;
-    height: 60px;
-    background: var(--bg);
-    border: 2px dashed var(--border);
-    border-radius: var(--r-sm);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px;
-    color: var(--ink3);
-    font-weight: 500;
-    overflow: hidden;
-    position: relative;
-  }
-  .compare-slot.filled {
-    border-style: solid;
-    border-color: var(--accent);
-    background: rgba(212,84,26,0.04);
-  }
-  .compare-slot-content { display: flex; align-items: center; gap: 8px; padding: 0 10px; width: 100%; }
-  .compare-slot-img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 22px; overflow: hidden; }
-  .compare-slot-img img { width: 100%; height: 100%; object-fit: cover; }
-  .compare-slot-info { flex: 1; min-width: 0; }
-  .compare-slot-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .compare-slot-price { font-size: 12px; color: var(--accent); font-weight: 600; }
-  .compare-slot-remove { background: none; border: none; font-size: 16px; color: var(--ink3); cursor: pointer; padding: 4px; flex-shrink: 0; }
-  .compare-go-btn {
-    width: 100%;
-    padding: 13px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: var(--r-sm);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    opacity: 0.4;
-    transition: opacity 0.15s;
-  }
-  .compare-go-btn.ready { opacity: 1; }
-
-  /* COMPARE VIEW MODAL */
-  .compare-view { padding: 0 16px 20px; }
-  .compare-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .compare-col { display: flex; flex-direction: column; gap: 0; }
-  .compare-col-img {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    border-radius: var(--r-sm) var(--r-sm) 0 0;
-  }
-  .compare-col-img-placeholder {
-    width: 100%;
-    aspect-ratio: 1;
-    border-radius: var(--r-sm) var(--r-sm) 0 0;
-    background: linear-gradient(135deg, #F5F0E8, #EDE5D4);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 44px;
-  }
-  .compare-col-body {
-    background: var(--card);
-    border-radius: 0 0 var(--r-sm) var(--r-sm);
-    padding: 12px;
-    flex: 1;
-    box-shadow: var(--shadow);
-  }
-  .compare-col-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
-  .compare-col-price { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--accent); margin-bottom: 8px; }
-  .compare-row { margin-bottom: 8px; }
-  .compare-row-label { font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--ink3); margin-bottom: 2px; }
-  .compare-row-val { font-size: 12px; color: var(--ink2); line-height: 1.4; }
-  .compare-winner {
-    background: var(--green);
-    color: white;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    padding: 2px 8px;
-    border-radius: 20px;
-    display: inline-block;
-    margin-bottom: 6px;
-  }
-
-  /* CONFIRM DIALOG */
-  .confirm-overlay {
-    position: fixed; inset: 0;
-    background: rgba(26,18,8,0.6);
-    z-index: 300;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-  }
-  .confirm-overlay.open { opacity: 1; pointer-events: all; }
-  .confirm-box {
-    background: var(--surface);
-    border-radius: 20px;
-    padding: 28px 24px;
-    width: 100%;
-    max-width: 340px;
-    text-align: center;
-    transform: scale(0.9);
-    transition: transform 0.2s;
-  }
-  .confirm-overlay.open .confirm-box { transform: scale(1); }
-  .confirm-icon { font-size: 44px; margin-bottom: 12px; }
-  .confirm-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-  .confirm-desc { font-size: 14px; color: var(--ink3); margin-bottom: 24px; }
-  .confirm-actions { display: flex; gap: 10px; }
-
+  .modal-overlay{position:fixed;inset:0;background:rgba(26,18,8,.5);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}
+  .modal-overlay.open{opacity:1;pointer-events:all}
+  .modal{background:var(--surface);border-radius:24px 24px 0 0;width:100%;max-height:92dvh;overflow-y:auto;padding:0 0 40px;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1)}
+  .modal-overlay.open .modal{transform:translateY(0)}
+  .modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0}
+  .modal-header{padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between}
+  .modal-title{font-family:'Fraunces',serif;font-size:22px;font-weight:700}
+  .modal-close{background:var(--bg);border:none;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+  /* FORM */
+  .form{padding:20px;display:flex;flex-direction:column;gap:18px}
+  .form-group{display:flex;flex-direction:column;gap:6px}
+  .form-label{font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink3)}
+  .form-input{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:16px;color:var(--ink);outline:none;transition:border-color .15s;width:100%}
+  .form-input:focus{border-color:var(--accent)}
+  textarea.form-input{resize:vertical;min-height:80px}
+  /* PRICE ROW */
+  .price-row{display:flex;gap:10px}
+  .price-row .form-input{flex:1}
+  .currency-select{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);padding:12px 8px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:var(--ink);outline:none;cursor:pointer;width:88px;-webkit-appearance:none;text-align:center}
+  .currency-select:focus{border-color:var(--accent)}
+  /* IMAGE */
+  .img-picker{display:flex;flex-direction:column;gap:12px}
+  .img-preview-wrap{width:100%;aspect-ratio:2/1;border-radius:var(--rsm);background:var(--bg);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .img-preview{width:100%;height:100%;object-fit:cover;display:block}
+  .img-ph{font-size:40px}
+  .img-ph-lg{font-size:64px}
+  .img-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .img-option-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);padding:12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--ink);display:flex;flex-direction:column;align-items:center;gap:6px}
+  .img-option-btn:active{background:var(--border)}
+  .img-option-btn span:first-child{font-size:24px}
+  /* EMOJI */
+  .emoji-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+  .emoji-btn{aspect-ratio:1;border:1.5px solid var(--border);border-radius:var(--rsm);background:var(--bg);font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .15s,transform .1s}
+  .emoji-btn:active{transform:scale(.9)}
+  .emoji-btn.sel{border-color:var(--accent);background:rgba(212,84,26,.08)}
+  /* TAGS */
+  .tag-input-row{display:flex;gap:8px;align-items:center}
+  .tag-input-field{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:16px;color:var(--ink);outline:none;transition:border-color .15s}
+  .tag-input-field:focus{border-color:var(--accent)}
+  .tag-add-btn{width:46px;height:46px;border-radius:var(--rsm);background:var(--accent);color:#fff;border:none;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .tag-add-btn:active{opacity:.8}
+  .tag-chips{display:flex;flex-wrap:wrap;gap:6px;min-height:4px}
+  .tag-pill{font-size:13px;font-weight:500;padding:5px 12px;border-radius:20px;background:var(--accent);color:#fff;display:flex;align-items:center;gap:5px}
+  .tag-pill button{background:none;border:none;color:#fff;font-size:15px;cursor:pointer;line-height:1;padding:0}
+  /* DETAIL */
+  .detail-img{width:100%;aspect-ratio:4/3;object-fit:cover}
+  .detail-img-ph{width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;font-size:80px;background:linear-gradient(135deg,#F5F0E8,#EDE5D4)}
+  .detail-body{padding:20px}
+  .detail-name{font-family:'Fraunces',serif;font-size:26px;font-weight:700;line-height:1.2;margin-bottom:4px}
+  .detail-date{font-size:12px;color:var(--ink3);margin-bottom:16px}
+  .detail-price{font-family:'Fraunces',serif;font-size:34px;font-weight:900;color:var(--accent);margin-bottom:4px}
+  .detail-hkd{font-size:13px;color:var(--ink3);margin-bottom:16px}
+  .detail-sec{margin-bottom:16px}
+  .detail-sec-label{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+  .detail-desc{font-size:14px;color:var(--ink2);line-height:1.6}
+  .detail-url{font-size:13px;color:var(--accent);text-decoration:none;word-break:break-all}
+  .detail-actions{display:flex;gap:10px;padding:0 20px}
+  .btn-primary{flex:1;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer}
+  .btn-primary:active{opacity:.8}
+  .btn-secondary{flex:1;padding:14px;background:var(--bg);color:var(--ink);border:1.5px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer}
+  .btn-danger{flex:1;padding:14px;background:#FFF0EE;color:#C0392B;border:1.5px solid #FADADD;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer}
+  /* COMPARE BAR */
+  .compare-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--accent);padding:12px 16px 32px;z-index:98;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);box-shadow:0 -4px 30px rgba(212,84,26,.12)}
+  .compare-bar.visible{transform:translateY(0)}
+  .cmp-bar-title{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .cmp-slots{display:flex;gap:10px;margin-bottom:12px}
+  .cmp-slot{flex:1;height:60px;background:var(--bg);border:2px dashed var(--border);border-radius:var(--rsm);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink3);font-weight:500;overflow:hidden}
+  .cmp-slot.filled{border-style:solid;border-color:var(--accent);background:rgba(212,84,26,.04)}
+  .cmp-slot-c{display:flex;align-items:center;gap:8px;padding:0 10px;width:100%}
+  .cmp-slot-img{width:40px;height:40px;border-radius:6px;flex-shrink:0;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden}
+  .cmp-slot-img img{width:100%;height:100%;object-fit:cover}
+  .cmp-slot-info{flex:1;min-width:0}
+  .cmp-slot-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cmp-slot-price{font-size:12px;color:var(--accent);font-weight:600}
+  .cmp-slot-rm{background:none;border:none;font-size:16px;color:var(--ink3);cursor:pointer;padding:4px;flex-shrink:0}
+  .cmp-go{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;opacity:.4;transition:opacity .15s}
+  .cmp-go.ready{opacity:1}
+  /* COMPARE VIEW */
+  .cmp-view{padding:16px 16px 0}
+  .cmp-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .cmp-col{display:flex;flex-direction:column}
+  .cmp-col-img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--rsm) var(--rsm) 0 0}
+  .cmp-col-img-ph{width:100%;aspect-ratio:1;border-radius:var(--rsm) var(--rsm) 0 0;background:linear-gradient(135deg,#F5F0E8,#EDE5D4);display:flex;align-items:center;justify-content:center;font-size:44px}
+  .cmp-col-body{background:var(--card);border-radius:0 0 var(--rsm) var(--rsm);padding:12px;flex:1;box-shadow:var(--shadow)}
+  .cmp-col-name{font-weight:700;font-size:14px;margin-bottom:6px}
+  .cmp-col-price{font-family:'Fraunces',serif;font-size:18px;font-weight:900;color:var(--accent)}
+  .cmp-col-hkd{font-size:11px;color:var(--ink3);margin-bottom:8px;min-height:16px}
+  .cmp-row{margin-bottom:8px}
+  .cmp-row-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:2px}
+  .cmp-row-val{font-size:12px;color:var(--ink2);line-height:1.4}
+  .cmp-winner{background:var(--green);color:#fff;font-size:10px;font-weight:700;letter-spacing:.5px;padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:6px}
+  /* CONFIRM */
+  .confirm-overlay{position:fixed;inset:0;background:rgba(26,18,8,.6);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+  .confirm-overlay.open{opacity:1;pointer-events:all}
+  .confirm-box{background:var(--surface);border-radius:20px;padding:28px 24px;width:100%;max-width:340px;text-align:center;transform:scale(.9);transition:transform .2s}
+  .confirm-overlay.open .confirm-box{transform:scale(1)}
+  .confirm-icon{font-size:44px;margin-bottom:12px}
+  .confirm-title{font-family:'Fraunces',serif;font-size:20px;font-weight:700;margin-bottom:8px}
+  .confirm-desc{font-size:14px;color:var(--ink3);margin-bottom:24px}
+  .confirm-actions{display:flex;gap:10px}
   /* TOAST */
-  .toast {
-    position: fixed;
-    top: 76px; left: 50%;
-    transform: translateX(-50%) translateY(-20px);
-    background: var(--ink);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 30px;
-    font-size: 13px;
-    font-weight: 500;
-    opacity: 0;
-    transition: opacity 0.2s, transform 0.2s;
-    z-index: 400;
-    white-space: nowrap;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast{position:fixed;top:76px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;z-index:400;white-space:nowrap;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  /* SPINNER */
+  .spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+  @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="header">
   <div class="logo">Buy<span>Buy</span></div>
-  <div class="header-actions">
-    <button class="btn-icon" id="compareToggleBtn" title="比較模式" onclick="toggleCompareMode()">⚖️</button>
+  <div style="display:flex;gap:10px;align-items:center">
+    <button class="btn-icon" id="compareToggleBtn" onclick="toggleCompareMode()">⚖️</button>
   </div>
 </header>
 
-<!-- MAIN -->
+<!-- TAG FILTER BAR -->
+<div class="filter-bar" id="filterBar" style="display:none"></div>
+
 <main class="main">
-  <div class="section-title">我的心願單</div>
+  <div class="section-header">
+    <div class="section-title" style="margin-bottom:0">我的心願單</div>
+    <div class="filter-result-label" id="filterLabel"></div>
+  </div>
   <div class="grid" id="productGrid"></div>
 </main>
 
-<!-- FAB -->
 <button class="fab" onclick="openAddModal()">＋</button>
 
 <!-- COMPARE BAR -->
 <div class="compare-bar" id="compareBar">
-  <div class="compare-bar-title">⚖️ 比較模式 — 點選商品加入</div>
-  <div class="compare-slots">
-    <div class="compare-slot" id="slot0"><span>點選商品 1</span></div>
-    <div class="compare-slot" id="slot1"><span>點選商品 2</span></div>
+  <div class="cmp-bar-title">⚖️ 比較模式 — 點選商品加入</div>
+  <div class="cmp-slots">
+    <div class="cmp-slot" id="slot0"><span>點選商品 1</span></div>
+    <div class="cmp-slot" id="slot1"><span>點選商品 2</span></div>
   </div>
-  <button class="compare-go-btn" id="compareGoBtn" onclick="openCompareView()">開始比較</button>
+  <button class="cmp-go" id="cmpGoBtn" onclick="openCompareView()">開始比較</button>
 </div>
 
 <!-- ADD/EDIT MODAL -->
@@ -615,72 +201,69 @@
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-header">
-      <div class="modal-title" id="formModalTitle">新增商品</div>
-      <button class="modal-close" onclick="closeFormModal()">✕</button>
+      <div class="modal-title" id="formTitle">新增商品</div>
+      <button class="modal-close" onclick="closeModal('formModal')">✕</button>
     </div>
     <div class="form">
       <input type="hidden" id="editId">
 
-      <!-- IMAGE -->
       <div class="form-group">
         <div class="form-label">商品圖片</div>
         <div class="img-picker">
-          <div class="img-preview-wrap" id="imgPreviewWrap">
-            <div class="img-preview-placeholder" id="imgPlaceholder">📦</div>
-          </div>
+          <div class="img-preview-wrap" id="imgPreview"><div class="img-ph">📦</div></div>
           <div class="img-options">
-            <button class="img-option-btn" onclick="document.getElementById('fileInput').click()">
-              <span>📁</span>
-              <span>上傳圖片</span>
-            </button>
-            <button class="img-option-btn" onclick="openEmojiPicker()">
-              <span>😊</span>
-              <span>選擇圖示</span>
-            </button>
+            <button class="img-option-btn" onclick="document.getElementById('fileInput').click()" type="button"><span>📁</span><span>上傳圖片</span></button>
+            <button class="img-option-btn" onclick="toggleEmojiPicker()" type="button"><span>😊</span><span>選擇圖示</span></button>
           </div>
           <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileUpload(event)">
         </div>
       </div>
 
-      <!-- EMOJI PICKER (hidden by default) -->
-      <div class="form-group" id="emojiPickerGroup" style="display:none">
+      <div class="form-group" id="emojiGroup" style="display:none">
         <div class="form-label">選擇圖示</div>
         <div class="emoji-grid" id="emojiGrid"></div>
       </div>
 
-      <!-- NAME -->
       <div class="form-group">
         <div class="form-label">商品名稱 *</div>
-        <input class="form-input" type="text" id="inputName" placeholder="例如：AirPods Pro" maxlength="50">
+        <input class="form-input" type="text" id="inputName" placeholder="例如：AirPods Pro" maxlength="50" autocomplete="off">
       </div>
 
-      <!-- PRICE -->
       <div class="form-group">
         <div class="form-label">價格</div>
-        <input class="form-input" type="number" id="inputPrice" placeholder="0" min="0">
+        <div class="price-row">
+          <input class="form-input" type="number" id="inputPrice" placeholder="0" min="0" inputmode="decimal">
+          <select class="currency-select" id="inputCurrency">
+            <option value="HKD">HKD</option>
+            <option value="JPY">JPY</option>
+            <option value="TWD">TWD</option>
+            <option value="USD">USD</option>
+          </select>
+        </div>
       </div>
 
-      <!-- URL -->
       <div class="form-group">
         <div class="form-label">商品連結</div>
         <input class="form-input" type="url" id="inputUrl" placeholder="https://...">
       </div>
 
-      <!-- TAGS -->
       <div class="form-group">
-        <div class="form-label">標籤（輸入後按 Enter）</div>
-        <div class="tag-input-wrap" id="tagWrap" onclick="document.getElementById('tagField').focus()">
-          <input class="tag-input-field" id="tagField" placeholder="加入標籤..." onkeydown="handleTagInput(event)">
+        <div class="form-label">標籤</div>
+        <div class="tag-chips" id="tagChips"></div>
+        <div class="tag-input-row" style="margin-top:8px">
+          <input class="tag-input-field" id="tagField" placeholder="輸入標籤名稱" maxlength="20"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();addTag()}"
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <button class="tag-add-btn" onclick="addTag()" type="button">＋</button>
         </div>
       </div>
 
-      <!-- NOTE -->
       <div class="form-group">
         <div class="form-label">備註</div>
         <textarea class="form-input" id="inputNote" placeholder="價格比較、購買原因..."></textarea>
       </div>
 
-      <button class="btn-primary" onclick="saveProduct()">儲存商品</button>
+      <button class="btn-primary" id="saveBtn" onclick="saveProduct()" type="button">儲存商品</button>
     </div>
   </div>
 </div>
@@ -702,11 +285,12 @@
       <div class="modal-title">比較</div>
       <button class="modal-close" onclick="closeModal('compareModal')">✕</button>
     </div>
-    <div class="compare-view" id="compareContent"></div>
+    <div class="cmp-view" id="compareContent"></div>
+    <div style="height:20px"></div>
   </div>
 </div>
 
-<!-- CONFIRM DIALOG -->
+<!-- CONFIRM -->
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-box">
     <div class="confirm-icon">🗑️</div>
@@ -719,417 +303,348 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ── DATA ─────────────────────────────────────────────────────────────────────
-const STORAGE_KEY = 'buybuy_products_v1';
-let products = [];
-let currentTags = [];
-let currentImage = null; // {type: 'url'|'emoji', value: '...'}
-let compareMode = false;
-let compareItems = [null, null];
-let pendingDeleteId = null;
-
+const STORAGE_KEY = 'buybuy_v2';
+const MAX_PX = 800, MAX_Q = 0.75;
+const TO_HKD = {HKD:1,JPY:0.051,TWD:0.24,USD:7.78};
+const SYM = {HKD:'HK$',JPY:'¥',TWD:'NT$',USD:'US$'};
 const EMOJIS = ['📦','👟','👗','👜','💄','📱','💻','🎧','📷','🎮','🏠','🛋️','🍳','📚','✏️','🎸','🏋️','🚴','✈️','🌸','💍','⌚','🕶️','🎒','🧴','🪴','🧸','🎁','💡','🔧'];
 
-function loadData() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    products = raw ? JSON.parse(raw) : [];
-  } catch(e) { products = []; }
+let products=[], currentTags=[], currentImage=null, compareMode=false, compareItems=[null,null];
+
+function loadData(){try{products=JSON.parse(localStorage.getItem(STORAGE_KEY))||[];}catch(e){products=[];}}
+function saveData(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(products));return true;}catch(e){return false;}}
+function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── COMPRESS ──────────────────────────────────────────────────────────────────
+function compressImage(file){
+  return new Promise((res,rej)=>{
+    const reader=new FileReader();
+    reader.onerror=()=>rej(new Error('讀取失敗'));
+    reader.onload=ev=>{
+      const img=new Image();
+      img.onerror=()=>rej(new Error('圖片載入失敗'));
+      img.onload=()=>{
+        let w=img.width,h=img.height;
+        if(w>MAX_PX||h>MAX_PX){if(w>h){h=Math.round(h*MAX_PX/w);w=MAX_PX;}else{w=Math.round(w*MAX_PX/h);h=MAX_PX;}}
+        const c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        res(c.toDataURL('image/jpeg',MAX_Q));
+      };
+      img.src=ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
-function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-}
-
-function genId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
-}
-
-// ── RENDER ────────────────────────────────────────────────────────────────────
-function renderGrid() {
-  const grid = document.getElementById('productGrid');
-  if (products.length === 0) {
-    grid.innerHTML = `
-      <div class="empty">
-        <div class="empty-icon">🛍️</div>
-        <div class="empty-title">還沒有商品</div>
-        <div class="empty-sub">點擊右下角 ＋ 新增第一個商品</div>
-      </div>`;
-    return;
-  }
-
-  grid.innerHTML = products.map((p, i) => {
-    const compareIdx = compareItems.indexOf(p.id);
-    const isSelected = compareIdx !== -1;
-    const imgHTML = buildCardImg(p.image);
-    const tagsHTML = (p.tags||[]).slice(0,3).map(t => `<span class="tag">${t}</span>`).join('');
-    const priceHTML = p.price ? `<div class="card-price">$${Number(p.price).toLocaleString()}<span> TWD</span></div>` : `<div class="card-price" style="color:var(--ink3);font-size:14px">未設定價格</div>`;
-    return `
-      <div class="card${isSelected?' selected-compare':''}" 
-           id="card-${p.id}"
-           onclick="cardClick('${p.id}')"
-           draggable="true"
-           ondragstart="dragStart(event,'${p.id}')"
-           ondragend="dragEnd(event)">
-        <div class="compare-badge">${compareIdx+1}</div>
-        ${imgHTML}
-        <div class="card-body">
-          <div class="card-name">${escHtml(p.name)}</div>
-          ${priceHTML}
-          ${tagsHTML ? `<div class="card-tags">${tagsHTML}</div>` : ''}
-        </div>
-      </div>`;
+// ── RENDER GRID ───────────────────────────────────────────────────────────────
+function renderGrid(){
+  const g=document.getElementById('productGrid');
+  const label=document.getElementById('filterLabel');
+  const filtered=typeof getFilteredProducts==='function'?getFilteredProducts():products;
+  if(!products.length){
+    if(label)label.textContent='';
+    g.innerHTML=`<div class="empty"><div class="empty-icon">🛍️</div><div class="empty-title">還沒有商品</div><div class="empty-sub">點擊右下角 ＋ 新增第一個商品</div></div>`;return;}
+  if(label)label.textContent=activeTags.size?`${filtered.length} / ${products.length} 件`:'';
+  if(!filtered.length){
+    g.innerHTML=`<div class="empty"><div class="empty-icon">🏷️</div><div class="empty-title">沒有符合的商品</div><div class="empty-sub">試試其他標籤組合</div></div>`;return;}
+  g.innerHTML=filtered.map(p=>{
+    const ci=compareItems.indexOf(p.id),sel=ci!==-1;
+    const sym=SYM[p.currency||'HKD'];
+    const priceStr=p.price!=null?`${sym}${Number(p.price).toLocaleString()}`:'未設定';
+    const pc=p.price!=null?'var(--accent)':'var(--ink3)';
+    const pf=p.price!=null?'17px':'13px';
+    const tags=(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
+    const imgH=cardImg(p.image);
+    return `<div class="card${sel?' selected-compare':''}" id="card-${p.id}" onclick="cardClick('${p.id}')">
+      <div class="cmp-badge">${ci+1}</div>
+      ${imgH}
+      <div class="card-body">
+        <div class="card-name">${esc(p.name)}</div>
+        <div class="card-price" style="color:${pc};font-size:${pf}">${esc(priceStr)}<span class="cur-badge">${p.currency||'HKD'}</span></div>
+        ${tags?`<div class="card-tags">${tags}</div>`:''}
+      </div>
+    </div>`;
   }).join('');
 }
 
-function buildCardImg(image) {
-  if (!image) return `<div class="card-img-placeholder">📦</div>`;
-  if (image.type === 'emoji') return `<div class="card-img-placeholder">${image.value}</div>`;
-  if (image.type === 'url') return `<img class="card-img" src="${image.value}" alt="product" onerror="this.parentNode.innerHTML='<div class=\\'card-img-placeholder\\'>📦</div>'">`;
-  return `<div class="card-img-placeholder">📦</div>`;
+function cardImg(img,lg=false){
+  const cls=lg?'cmp-col-img-ph':'card-img-ph'; const sz=lg?'44px':'52px';
+  if(!img)return`<div class="${cls}" style="font-size:${sz}">📦</div>`;
+  if(img.type==='emoji')return`<div class="${cls}" style="font-size:${sz}">${img.value}</div>`;
+  const ic=lg?'cmp-col-img':'card-img';
+  return`<img class="${ic}" src="${img.value}" alt="" onerror="this.outerHTML='<div class=\\'${cls}\\' style=\\'font-size:${sz}\\'>📦</div>'">`;
 }
 
 // ── CARD CLICK ────────────────────────────────────────────────────────────────
-function cardClick(id) {
-  if (compareMode) {
-    toggleCompareItem(id);
-  } else {
-    openDetailModal(id);
-  }
-}
+function cardClick(id){compareMode?toggleCmpItem(id):openDetail(id);}
 
-// ── DETAIL MODAL ──────────────────────────────────────────────────────────────
-function openDetailModal(id) {
-  const p = products.find(x => x.id === id);
-  if (!p) return;
-
-  let imgHTML;
-  if (!p.image) imgHTML = `<div class="detail-img-placeholder">📦</div>`;
-  else if (p.image.type === 'emoji') imgHTML = `<div class="detail-img-placeholder">${p.image.value}</div>`;
-  else imgHTML = `<img class="detail-img" src="${p.image.value}" alt="${escHtml(p.name)}" onerror="this.outerHTML='<div class=\\'detail-img-placeholder\\'>📦</div>'">`;
-
-  const tagsHTML = (p.tags||[]).map(t => `<span class="tag">${t}</span>`).join('');
-  const dateStr = new Date(p.createdAt).toLocaleDateString('zh-TW', {year:'numeric',month:'long',day:'numeric'});
-  const urlHTML = p.url ? `<div class="detail-section"><div class="detail-section-label">購買連結</div><a class="detail-url" href="${escHtml(p.url)}" target="_blank">${escHtml(p.url)}</a></div>` : '';
-  const noteHTML = p.note ? `<div class="detail-section"><div class="detail-section-label">備註</div><div class="detail-desc">${escHtml(p.note)}</div></div>` : '';
-  const tagsSection = tagsHTML ? `<div class="detail-section"><div class="detail-section-label">標籤</div><div class="card-tags">${tagsHTML}</div></div>` : '';
-
-  document.getElementById('detailContent').innerHTML = `
-    ${imgHTML}
+// ── DETAIL ────────────────────────────────────────────────────────────────────
+function openDetail(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  const sym=SYM[p.currency||'HKD'],cur=p.currency||'HKD';
+  let hkdLine='';
+  if(p.price!=null&&cur!=='HKD'){const h=Math.round(p.price*TO_HKD[cur]);hkdLine=`<div class="detail-hkd">≈ HK$${h.toLocaleString()}</div>`;}
+  const tags=(p.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
+  const date=new Date(p.createdAt).toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric'});
+  const imgH=p.image
+    ?(p.image.type==='emoji'?`<div class="detail-img-ph">${p.image.value}</div>`
+    :`<img class="detail-img" src="${p.image.value}" alt="" onerror="this.outerHTML='<div class=\\'detail-img-ph\\'>📦</div>'">`)
+    :`<div class="detail-img-ph">📦</div>`;
+  document.getElementById('detailContent').innerHTML=`
+    ${imgH}
     <div class="detail-body">
-      <div class="detail-name">${escHtml(p.name)}</div>
-      <div class="detail-date">記錄於 ${dateStr}</div>
-      ${p.price ? `<div class="detail-price">$${Number(p.price).toLocaleString()} <span style="font-size:16px;font-weight:400;color:var(--ink3)">TWD</span></div>` : ''}
-      ${tagsSection}
-      ${noteHTML}
-      ${urlHTML}
+      <div class="detail-name">${esc(p.name)}</div>
+      <div class="detail-date">記錄於 ${date}</div>
+      ${p.price!=null?`<div class="detail-price">${sym}${Number(p.price).toLocaleString()} <span style="font-size:16px;font-weight:400;color:var(--ink3)">${cur}</span></div>${hkdLine}`:''}
+      ${tags?`<div class="detail-sec"><div class="detail-sec-label">標籤</div><div class="card-tags">${tags}</div></div>`:''}
+      ${p.note?`<div class="detail-sec"><div class="detail-sec-label">備註</div><div class="detail-desc">${esc(p.note)}</div></div>`:''}
+      ${p.url?`<div class="detail-sec"><div class="detail-sec-label">購買連結</div><a class="detail-url" href="${esc(p.url)}" target="_blank">${esc(p.url)}</a></div>`:''}
     </div>`;
-
-  document.getElementById('detailActions').innerHTML = `
+  document.getElementById('detailActions').innerHTML=`
     <button class="btn-secondary" onclick="closeModal('detailModal');openEditModal('${p.id}')">編輯</button>
     <button class="btn-danger" onclick="confirmDelete('${p.id}')">刪除</button>`;
-
   openModal('detailModal');
 }
 
 // ── ADD / EDIT ────────────────────────────────────────────────────────────────
-function openAddModal() {
-  document.getElementById('formModalTitle').textContent = '新增商品';
-  document.getElementById('editId').value = '';
-  document.getElementById('inputName').value = '';
-  document.getElementById('inputPrice').value = '';
-  document.getElementById('inputUrl').value = '';
-  document.getElementById('inputNote').value = '';
-  currentTags = [];
-  currentImage = null;
-  renderTags();
-  renderImgPreview();
-  document.getElementById('emojiPickerGroup').style.display = 'none';
-  renderEmojiGrid();
+function openAddModal(){
+  document.getElementById('formTitle').textContent='新增商品';
+  document.getElementById('editId').value='';
+  document.getElementById('inputName').value='';
+  document.getElementById('inputPrice').value='';
+  document.getElementById('inputCurrency').value='HKD';
+  document.getElementById('inputUrl').value='';
+  document.getElementById('inputNote').value='';
+  document.getElementById('tagField').value='';
+  currentTags=[];currentImage=null;
+  renderTagChips();renderImgPreview();
+  document.getElementById('emojiGroup').style.display='none';
   openModal('formModal');
 }
 
-function openEditModal(id) {
-  const p = products.find(x => x.id === id);
-  if (!p) return;
-  closeModal('detailModal');
-  document.getElementById('formModalTitle').textContent = '編輯商品';
-  document.getElementById('editId').value = id;
-  document.getElementById('inputName').value = p.name || '';
-  document.getElementById('inputPrice').value = p.price || '';
-  document.getElementById('inputUrl').value = p.url || '';
-  document.getElementById('inputNote').value = p.note || '';
-  currentTags = [...(p.tags||[])];
-  currentImage = p.image || null;
-  renderTags();
-  renderImgPreview();
-  document.getElementById('emojiPickerGroup').style.display = 'none';
-  renderEmojiGrid();
+function openEditModal(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  document.getElementById('formTitle').textContent='編輯商品';
+  document.getElementById('editId').value=id;
+  document.getElementById('inputName').value=p.name||'';
+  document.getElementById('inputPrice').value=p.price!=null?p.price:'';
+  document.getElementById('inputCurrency').value=p.currency||'HKD';
+  document.getElementById('inputUrl').value=p.url||'';
+  document.getElementById('inputNote').value=p.note||'';
+  document.getElementById('tagField').value='';
+  currentTags=[...(p.tags||[])];currentImage=p.image||null;
+  renderTagChips();renderImgPreview();
+  document.getElementById('emojiGroup').style.display='none';
   openModal('formModal');
 }
 
-function saveProduct() {
-  const name = document.getElementById('inputName').value.trim();
-  if (!name) { showToast('請輸入商品名稱'); document.getElementById('inputName').focus(); return; }
-
-  const id = document.getElementById('editId').value;
-  const price = document.getElementById('inputPrice').value;
-  const url = document.getElementById('inputUrl').value.trim();
-  const note = document.getElementById('inputNote').value.trim();
-
-  if (id) {
-    const idx = products.findIndex(x => x.id === id);
-    if (idx !== -1) {
-      products[idx] = { ...products[idx], name, price: price?Number(price):null, url, note, tags: [...currentTags], image: currentImage };
-    }
-  } else {
-    products.unshift({ id: genId(), name, price: price?Number(price):null, url, note, tags: [...currentTags], image: currentImage, createdAt: Date.now() });
+async function saveProduct(){
+  const name=document.getElementById('inputName').value.trim();
+  if(!name){showToast('請輸入商品名稱 ⚠️');document.getElementById('inputName').focus();return;}
+  const btn=document.getElementById('saveBtn');
+  btn.innerHTML='<span class="spinner"></span>';btn.disabled=true;
+  const id=document.getElementById('editId').value;
+  const priceRaw=document.getElementById('inputPrice').value;
+  const price=priceRaw!==''?Number(priceRaw):null;
+  const currency=document.getElementById('inputCurrency').value;
+  const url=document.getElementById('inputUrl').value.trim();
+  const note=document.getElementById('inputNote').value.trim();
+  const prod={name,price,currency,url,note,tags:[...currentTags],image:currentImage};
+  if(id){const i=products.findIndex(x=>x.id===id);if(i!==-1)products[i]={...products[i],...prod};}
+  else products.unshift({id:genId(),...prod,createdAt:Date.now()});
+  const ok=saveData();
+  btn.innerHTML='儲存商品';btn.disabled=false;
+  if(!ok){
+    const i=id?products.findIndex(x=>x.id===id):0;
+    products[i].image=null;
+    if(saveData()){renderGrid();closeModal('formModal');showToast('圖片太大已略過，其他資料已儲存 ⚠️');}
+    else{if(!id)products.shift();showToast('儲存失敗，請嘗試縮小圖片 ⚠️');}
+    return;
   }
-
-  saveData();
-  renderGrid();
-  closeFormModal();
-  showToast(id ? '已更新商品 ✓' : '已新增商品 ✓');
-}
-
-function closeFormModal() {
-  closeModal('formModal');
+  renderFilterBar();renderGrid();closeModal('formModal');showToast(id?'已更新商品 ✓':'已新增商品 ✓');
 }
 
 // ── IMAGE ─────────────────────────────────────────────────────────────────────
-function handleFileUpload(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    currentImage = { type: 'url', value: ev.target.result };
+async function handleFileUpload(e){
+  const file=e.target.files[0];if(!file)return;
+  showToast('處理圖片中…');
+  try{
+    const dataUrl=await compressImage(file);
+    currentImage={type:'url',value:dataUrl};
     renderImgPreview();
-    document.getElementById('emojiPickerGroup').style.display = 'none';
-  };
-  reader.readAsDataURL(file);
-  e.target.value = '';
+    document.getElementById('emojiGroup').style.display='none';
+  }catch(err){showToast('圖片載入失敗 ⚠️');}
+  e.target.value='';
 }
 
-function openEmojiPicker() {
-  const grp = document.getElementById('emojiPickerGroup');
-  grp.style.display = grp.style.display === 'none' ? 'block' : 'none';
-  renderEmojiGrid();
+function toggleEmojiPicker(){
+  const g=document.getElementById('emojiGroup');
+  g.style.display=g.style.display==='none'?'block':'none';
+  if(g.style.display==='block')renderEmojiGrid();
 }
 
-function renderEmojiGrid() {
-  const grid = document.getElementById('emojiGrid');
-  const cur = currentImage?.type === 'emoji' ? currentImage.value : null;
-  grid.innerHTML = EMOJIS.map(e => `<button class="emoji-btn${e===cur?' selected':''}" onclick="selectEmoji('${e}')">${e}</button>`).join('');
+function renderEmojiGrid(){
+  const cur=currentImage?.type==='emoji'?currentImage.value:null;
+  document.getElementById('emojiGrid').innerHTML=EMOJIS.map(e=>`<button class="emoji-btn${e===cur?' sel':''}" onclick="pickEmoji('${e}')" type="button">${e}</button>`).join('');
 }
 
-function selectEmoji(emoji) {
-  currentImage = { type: 'emoji', value: emoji };
-  renderImgPreview();
-  renderEmojiGrid();
-}
+function pickEmoji(e){currentImage={type:'emoji',value:e};renderImgPreview();renderEmojiGrid();}
 
-function renderImgPreview() {
-  const wrap = document.getElementById('imgPreviewWrap');
-  if (!currentImage) {
-    wrap.innerHTML = `<div class="img-preview-placeholder" id="imgPlaceholder">📦</div>`;
-  } else if (currentImage.type === 'emoji') {
-    wrap.innerHTML = `<div class="img-preview-icon-large">${currentImage.value}</div>`;
-  } else {
-    wrap.innerHTML = `<img class="img-preview" src="${currentImage.value}" alt="preview">`;
-  }
+function renderImgPreview(){
+  const w=document.getElementById('imgPreview');
+  if(!currentImage)w.innerHTML=`<div class="img-ph">📦</div>`;
+  else if(currentImage.type==='emoji')w.innerHTML=`<div class="img-ph-lg">${currentImage.value}</div>`;
+  else w.innerHTML=`<img class="img-preview" src="${currentImage.value}" alt="">`;
 }
 
 // ── TAGS ──────────────────────────────────────────────────────────────────────
-function handleTagInput(e) {
-  if (e.key === 'Enter' || e.key === ',') {
-    e.preventDefault();
-    const val = e.target.value.trim().replace(/,/g,'');
-    if (val && !currentTags.includes(val) && currentTags.length < 8) {
-      currentTags.push(val);
-      renderTags();
-    }
-    e.target.value = '';
-  } else if (e.key === 'Backspace' && e.target.value === '' && currentTags.length > 0) {
-    currentTags.pop();
-    renderTags();
-  }
+function addTag(){
+  const f=document.getElementById('tagField'),v=f.value.trim();
+  if(v&&!currentTags.includes(v)&&currentTags.length<8){currentTags.push(v);renderTagChips();}
+  f.value='';f.focus();
 }
-
-function removeTag(tag) {
-  currentTags = currentTags.filter(t => t !== tag);
-  renderTags();
-}
-
-function renderTags() {
-  const wrap = document.getElementById('tagWrap');
-  const field = document.getElementById('tagField');
-  const pills = currentTags.map(t => `<span class="tag-pill">${escHtml(t)}<button onclick="removeTag('${escHtml(t)}')" type="button">×</button></span>`).join('');
-  wrap.innerHTML = pills + `<input class="tag-input-field" id="tagField" placeholder="${currentTags.length?'':'加入標籤...'}" onkeydown="handleTagInput(event)">`;
+function removeTag(t){currentTags=currentTags.filter(x=>x!==t);renderTagChips();}
+function renderTagChips(){
+  document.getElementById('tagChips').innerHTML=currentTags.map(t=>
+    `<span class="tag-pill">${esc(t)}<button onclick="removeTag('${esc(t)}')" type="button">×</button></span>`
+  ).join('');
 }
 
 // ── DELETE ────────────────────────────────────────────────────────────────────
-function confirmDelete(id) {
-  pendingDeleteId = id;
-  document.getElementById('confirmDeleteBtn').onclick = () => executeDelete(id);
+function confirmDelete(id){
   closeModal('detailModal');
+  document.getElementById('confirmDeleteBtn').onclick=()=>{
+    products=products.filter(x=>x.id!==id);
+    compareItems=compareItems.map(c=>c===id?null:c);
+    saveData();renderFilterBar();renderGrid();updateSlots();closeConfirm();showToast('已刪除商品');
+  };
   document.getElementById('confirmOverlay').classList.add('open');
 }
-
-function executeDelete(id) {
-  products = products.filter(x => x.id !== id);
-  compareItems = compareItems.map(c => c === id ? null : c);
-  saveData();
-  renderGrid();
-  updateCompareSlots();
-  closeConfirm();
-  showToast('已刪除商品');
-}
-
-function closeConfirm() {
-  document.getElementById('confirmOverlay').classList.remove('open');
-  pendingDeleteId = null;
-}
+function closeConfirm(){document.getElementById('confirmOverlay').classList.remove('open');}
 
 // ── COMPARE ───────────────────────────────────────────────────────────────────
-function toggleCompareMode() {
-  compareMode = !compareMode;
-  const btn = document.getElementById('compareToggleBtn');
-  const bar = document.getElementById('compareBar');
-  btn.classList.toggle('compare-active', compareMode);
-  bar.classList.toggle('visible', compareMode);
-  if (!compareMode) {
-    compareItems = [null, null];
-    renderGrid();
-    updateCompareSlots();
-  }
-  showToast(compareMode ? '比較模式：點選商品加入' : '已退出比較模式');
+function toggleCompareMode(){
+  compareMode=!compareMode;
+  document.getElementById('compareToggleBtn').classList.toggle('compare-active',compareMode);
+  document.getElementById('compareBar').classList.toggle('visible',compareMode);
+  if(!compareMode){compareItems=[null,null];renderGrid();updateSlots();}
+  showToast(compareMode?'比較模式：點選商品加入':'已退出比較模式');
 }
 
-function toggleCompareItem(id) {
-  const idx = compareItems.indexOf(id);
-  if (idx !== -1) {
-    compareItems[idx] = null;
-  } else {
-    const emptySlot = compareItems.indexOf(null);
-    if (emptySlot === -1) {
-      compareItems[0] = compareItems[1];
-      compareItems[1] = id;
-    } else {
-      compareItems[emptySlot] = id;
-    }
-  }
-  renderGrid();
-  updateCompareSlots();
+function toggleCmpItem(id){
+  const i=compareItems.indexOf(id);
+  if(i!==-1)compareItems[i]=null;
+  else{const e=compareItems.indexOf(null);if(e===-1){compareItems[0]=compareItems[1];compareItems[1]=id;}else compareItems[e]=id;}
+  renderGrid();updateSlots();
 }
 
-function updateCompareSlots() {
-  for (let i = 0; i < 2; i++) {
-    const slot = document.getElementById(`slot${i}`);
-    const id = compareItems[i];
-    if (!id) {
-      slot.className = 'compare-slot';
-      slot.innerHTML = `<span>點選商品 ${i+1}</span>`;
-    } else {
-      const p = products.find(x => x.id === id);
-      if (!p) { compareItems[i] = null; slot.className = 'compare-slot'; slot.innerHTML = `<span>點選商品 ${i+1}</span>`; continue; }
-      let imgEl;
-      if (!p.image) imgEl = `<div class="compare-slot-img">📦</div>`;
-      else if (p.image.type === 'emoji') imgEl = `<div class="compare-slot-img">${p.image.value}</div>`;
-      else imgEl = `<div class="compare-slot-img"><img src="${p.image.value}" alt=""></div>`;
-      slot.className = 'compare-slot filled';
-      slot.innerHTML = `<div class="compare-slot-content">${imgEl}<div class="compare-slot-info"><div class="compare-slot-name">${escHtml(p.name)}</div>${p.price?`<div class="compare-slot-price">$${Number(p.price).toLocaleString()}</div>`:''}</div><button class="compare-slot-remove" onclick="toggleCompareItem('${id}')">✕</button></div>`;
-    }
+function updateSlots(){
+  for(let i=0;i<2;i++){
+    const slot=document.getElementById(`slot${i}`),id=compareItems[i];
+    if(!id){slot.className='cmp-slot';slot.innerHTML=`<span>點選商品 ${i+1}</span>`;continue;}
+    const p=products.find(x=>x.id===id);
+    if(!p){compareItems[i]=null;slot.className='cmp-slot';slot.innerHTML=`<span>點選商品 ${i+1}</span>`;continue;}
+    const sym=SYM[p.currency||'HKD'];
+    const imgEl=!p.image?`<div class="cmp-slot-img">📦</div>`
+      :p.image.type==='emoji'?`<div class="cmp-slot-img">${p.image.value}</div>`
+      :`<div class="cmp-slot-img"><img src="${p.image.value}" alt=""></div>`;
+    slot.className='cmp-slot filled';
+    slot.innerHTML=`<div class="cmp-slot-c">${imgEl}<div class="cmp-slot-info"><div class="cmp-slot-name">${esc(p.name)}</div>${p.price!=null?`<div class="cmp-slot-price">${sym}${Number(p.price).toLocaleString()}</div>`:''}</div><button class="cmp-slot-rm" onclick="toggleCmpItem('${id}')" type="button">✕</button></div>`;
   }
-  const goBtn = document.getElementById('compareGoBtn');
-  goBtn.classList.toggle('ready', compareItems[0] && compareItems[1]);
+  document.getElementById('cmpGoBtn').classList.toggle('ready',!!(compareItems[0]&&compareItems[1]));
 }
 
-function openCompareView() {
-  if (!compareItems[0] || !compareItems[1]) return;
-  const p1 = products.find(x => x.id === compareItems[0]);
-  const p2 = products.find(x => x.id === compareItems[1]);
-  if (!p1 || !p2) return;
-
-  function colHTML(p, other) {
-    let imgHTML;
-    if (!p.image) imgHTML = `<div class="compare-col-img-placeholder">📦</div>`;
-    else if (p.image.type === 'emoji') imgHTML = `<div class="compare-col-img-placeholder">${p.image.value}</div>`;
-    else imgHTML = `<img class="compare-col-img" src="${p.image.value}" alt="${escHtml(p.name)}" onerror="this.outerHTML='<div class=\\'compare-col-img-placeholder\\'>📦</div>'">`;
-
-    const cheaper = p.price && other.price && p.price <= other.price;
-    const winnerBadge = cheaper ? `<span class="compare-winner">💰 較便宜</span>` : '';
-
-    const tags = (p.tags||[]).join(', ') || '—';
-    const note = p.note || '—';
-    const dateStr = new Date(p.createdAt).toLocaleDateString('zh-TW');
-
-    return `<div class="compare-col">
-      ${imgHTML}
-      <div class="compare-col-body">
-        ${winnerBadge}
-        <div class="compare-col-name">${escHtml(p.name)}</div>
-        <div class="compare-col-price">${p.price ? '$'+Number(p.price).toLocaleString() : '—'}</div>
-        <div class="compare-row"><div class="compare-row-label">標籤</div><div class="compare-row-val">${escHtml(tags)}</div></div>
-        <div class="compare-row"><div class="compare-row-label">記錄日</div><div class="compare-row-val">${dateStr}</div></div>
-        <div class="compare-row"><div class="compare-row-label">備註</div><div class="compare-row-val">${escHtml(note)}</div></div>
+function openCompareView(){
+  if(!compareItems[0]||!compareItems[1])return;
+  const p1=products.find(x=>x.id===compareItems[0]),p2=products.find(x=>x.id===compareItems[1]);
+  if(!p1||!p2)return;
+  const hkd=p=>(p.price!=null?p.price*(TO_HKD[p.currency||'HKD']||1):null);
+  const h1=hkd(p1),h2=hkd(p2);
+  const col=(p,cheaper)=>{
+    const sym=SYM[p.currency||'HKD'],cur=p.currency||'HKD';
+    const h=hkd(p);
+    const hkdLine=h!=null&&cur!=='HKD'?`≈ HK$${Math.round(h).toLocaleString()}`:'';
+    const imgH=cardImg(p.image,true);
+    const tags=(p.tags||[]).join(', ')||'—';
+    const date=new Date(p.createdAt).toLocaleDateString('zh-TW');
+    return `<div class="cmp-col">
+      ${imgH}
+      <div class="cmp-col-body">
+        ${cheaper&&h1!==h2?`<span class="cmp-winner">💰 較便宜</span>`:''}
+        <div class="cmp-col-name">${esc(p.name)}</div>
+        <div class="cmp-col-price">${p.price!=null?`${sym}${Number(p.price).toLocaleString()} <span style="font-size:11px;font-weight:400;color:var(--ink3)">${cur}</span>`:'—'}</div>
+        <div class="cmp-col-hkd">${hkdLine}</div>
+        <div class="cmp-row"><div class="cmp-row-label">標籤</div><div class="cmp-row-val">${esc(tags)}</div></div>
+        <div class="cmp-row"><div class="cmp-row-label">記錄日</div><div class="cmp-row-val">${date}</div></div>
+        ${p.note?`<div class="cmp-row"><div class="cmp-row-label">備註</div><div class="cmp-row-val">${esc(p.note)}</div></div>`:''}
       </div>
     </div>`;
-  }
-
-  document.getElementById('compareContent').innerHTML = `
-    <div class="compare-cols">
-      ${colHTML(p1, p2)}
-      ${colHTML(p2, p1)}
-    </div>`;
-
+  };
+  document.getElementById('compareContent').innerHTML=`<div class="cmp-cols">${col(p1,h1!=null&&h2!=null&&h1<=h2)}${col(p2,h1!=null&&h2!=null&&h2<=h1)}</div>`;
   openModal('compareModal');
 }
 
-// ── DRAG ──────────────────────────────────────────────────────────────────────
-function dragStart(e, id) {
-  if (!compareMode) return;
-  e.dataTransfer.setData('text/plain', id);
-  e.currentTarget.classList.add('dragging');
-}
-function dragEnd(e) {
-  e.currentTarget.classList.remove('dragging');
-}
-
-// ── MODAL HELPERS ─────────────────────────────────────────────────────────────
-function openModal(id) {
-  document.getElementById(id).classList.add('open');
-}
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-}
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) overlay.classList.remove('open');
-  });
+// ── MODALS ────────────────────────────────────────────────────────────────────
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});
 });
 
 // ── TOAST ─────────────────────────────────────────────────────────────────────
 let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2400);
 }
 
-// ── UTILS ─────────────────────────────────────────────────────────────────────
-function escHtml(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+// ── TAG FILTER ────────────────────────────────────────────────────────────────
+let activeTags = new Set();
+
+function getAllTags(){
+  const s = new Set();
+  products.forEach(p => (p.tags||[]).forEach(t => s.add(t)));
+  return [...s].sort();
+}
+
+function renderFilterBar(){
+  const bar = document.getElementById('filterBar');
+  const tags = getAllTags();
+  if(!tags.length){ bar.style.display='none'; return; }
+  bar.style.display='flex';
+  const allActive = activeTags.size === 0;
+  bar.innerHTML = `<button class="filter-chip all-chip${allActive?' active':''}" onclick="clearTagFilter()">全部<span class="filter-count">${products.length}</span></button>`
+    + tags.map(t => {
+        const count = products.filter(p=>(p.tags||[]).includes(t)).length;
+        const on = activeTags.has(t);
+        return `<button class="filter-chip${on?' active':''}" onclick="toggleTagFilter('${t.replace(/'/g,"\'")}')">${t}<span class="filter-count">${count}</span></button>`;
+      }).join('');
+}
+
+function toggleTagFilter(tag){
+  if(activeTags.has(tag)) activeTags.delete(tag);
+  else activeTags.add(tag);
+  renderFilterBar();
+  renderGrid();
+}
+
+function clearTagFilter(){
+  activeTags.clear();
+  renderFilterBar();
+  renderGrid();
+}
+
+function getFilteredProducts(){
+  if(activeTags.size === 0) return products;
+  return products.filter(p => [...activeTags].every(t => (p.tags||[]).includes(t)));
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-loadData();
-renderGrid();
+loadData();renderFilterBar();renderGrid();
 </script>
 </body>
 </html>
