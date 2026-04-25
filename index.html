@@ -159,11 +159,6 @@
   /* TOAST */
   .toast{position:fixed;top:76px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;z-index:400;white-space:nowrap;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  /* TAG SUGGEST */
-  .tag-suggest{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;min-height:0}
-  .tag-suggest-chip{padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;font-weight:500;color:var(--ink2);cursor:pointer;transition:all .15s;white-space:nowrap}
-  .tag-suggest-chip:active{transform:scale(.95)}
-  .tag-suggest-chip.used{background:var(--accent);border-color:var(--accent);color:#fff;opacity:.5;pointer-events:none}
   /* SPINNER */
   .spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
   @keyframes spin{to{transform:rotate(360deg)}}
@@ -178,7 +173,6 @@
   </div>
 </header>
 
-<!-- TAG FILTER BAR -->
 <div class="filter-bar" id="filterBar" style="display:none"></div>
 
 <main class="main">
@@ -191,7 +185,6 @@
 
 <button class="fab" onclick="openAddModal()">＋</button>
 
-<!-- COMPARE BAR -->
 <div class="compare-bar" id="compareBar">
   <div class="cmp-bar-title">⚖️ 比較模式 — 點選商品加入</div>
   <div class="cmp-slots">
@@ -201,7 +194,6 @@
   <button class="cmp-go" id="cmpGoBtn" onclick="openCompareView()">開始比較</button>
 </div>
 
-<!-- ADD/EDIT MODAL -->
 <div class="modal-overlay" id="formModal">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -243,7 +235,6 @@
             <option value="JPY">JPY</option>
             <option value="TWD">TWD</option>
             <option value="USD">USD</option>
-            <option value="CNY">CNY</option>
           </select>
         </div>
       </div>
@@ -256,11 +247,9 @@
       <div class="form-group">
         <div class="form-label">標籤</div>
         <div class="tag-chips" id="tagChips"></div>
-        <div id="tagSuggest" class="tag-suggest"></div>
         <div class="tag-input-row" style="margin-top:8px">
-          <input class="tag-input-field" id="tagField" placeholder="輸入新標籤…" maxlength="20"
+          <input class="tag-input-field" id="tagField" placeholder="輸入標籤名稱" maxlength="20"
             onkeydown="if(event.key==='Enter'){event.preventDefault();addTag()}"
-            oninput="renderTagSuggest()"
             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           <button class="tag-add-btn" onclick="addTag()" type="button">＋</button>
         </div>
@@ -276,7 +265,6 @@
   </div>
 </div>
 
-<!-- DETAIL MODAL -->
 <div class="modal-overlay" id="detailModal">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -285,7 +273,6 @@
   </div>
 </div>
 
-<!-- COMPARE VIEW MODAL -->
 <div class="modal-overlay" id="compareModal">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -298,7 +285,6 @@
   </div>
 </div>
 
-<!-- CONFIRM -->
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-box">
     <div class="confirm-icon">🗑️</div>
@@ -316,8 +302,8 @@
 <script>
 const STORAGE_KEY = 'buybuy_v2';
 const MAX_PX = 800, MAX_Q = 0.75;
-const TO_HKD = {HKD:1,JPY:0.051,TWD:0.24,USD:7.78,CNY:1.07};
-const SYM = {HKD:'HK$',JPY:'¥',TWD:'NT$',USD:'US$',CNY:'¥'};
+const TO_HKD = {HKD:1,JPY:0.051,TWD:0.24,USD:7.78};
+const SYM = {HKD:'HK$',JPY:'¥',TWD:'NT$',USD:'US$'};
 const EMOJIS = ['📦','👟','👗','👜','💄','📱','💻','🎧','📷','🎮','🏠','🛋️','🍳','📚','✏️','🎸','🏋️','🚴','✈️','🌸','💍','⌚','🕶️','🎒','🧴','🪴','🧸','🎁','💡','🔧'];
 
 let products=[], currentTags=[], currentImage=null, compareMode=false, compareItems=[null,null];
@@ -432,7 +418,6 @@ function openAddModal(){
   renderTagChips();renderImgPreview();
   document.getElementById('emojiGroup').style.display='none';
   openModal('formModal');
-  renderTagSuggest();
 }
 
 function openEditModal(id){
@@ -449,7 +434,6 @@ function openEditModal(id){
   renderTagChips();renderImgPreview();
   document.getElementById('emojiGroup').style.display='none';
   openModal('formModal');
-  renderTagSuggest();
 }
 
 async function saveProduct(){
@@ -522,31 +506,6 @@ function renderTagChips(){
   document.getElementById('tagChips').innerHTML=currentTags.map(t=>
     `<span class="tag-pill">${esc(t)}<button onclick="removeTag('${esc(t)}')" type="button">×</button></span>`
   ).join('');
-  renderTagSuggest();
-}
-
-function renderTagSuggest(){
-  const box=document.getElementById('tagSuggest');if(!box)return;
-  const allTags=getAllTags();
-  const query=(document.getElementById('tagField').value||'').trim().toLowerCase();
-  // show tags that match query (or all if empty), excluding already selected
-  const suggestions=allTags.filter(t=>{
-    if(currentTags.includes(t))return false;
-    if(query)return t.toLowerCase().includes(query);
-    return true;
-  });
-  if(!suggestions.length){box.innerHTML='';return;}
-  box.innerHTML=suggestions.map(t=>
-    `<button class="tag-suggest-chip" onclick="pickSuggestTag('${esc(t)}')" type="button">${esc(t)}</button>`
-  ).join('');
-}
-
-function pickSuggestTag(t){
-  if(!currentTags.includes(t)&&currentTags.length<8){
-    currentTags.push(t);
-    renderTagChips();
-    document.getElementById('tagField').value='';
-  }
 }
 
 // ── DELETE ────────────────────────────────────────────────────────────────────
@@ -597,15 +556,22 @@ function openCompareView(){
   if(!compareItems[0]||!compareItems[1])return;
   const p1=products.find(x=>x.id===compareItems[0]),p2=products.find(x=>x.id===compareItems[1]);
   if(!p1||!p2)return;
+
   const hkd=p=>(p.price!=null?p.price*(TO_HKD[p.currency||'HKD']||1):null);
   const h1=hkd(p1),h2=hkd(p2);
-  const col=(p,cheaper)=>{
+
+  // 計算互買比例
+  const buyRatio1 = (h1 && h2 && h2 > 0) ? (h1 / h2).toFixed(2) : null;
+  const buyRatio2 = (h1 && h2 && h1 > 0) ? (h2 / h1).toFixed(2) : null;
+
+  const col=(p, cheaper, ratio)=>{
     const sym=SYM[p.currency||'HKD'],cur=p.currency||'HKD';
     const h=hkd(p);
     const hkdLine=h!=null&&cur!=='HKD'?`≈ HK$${Math.round(h).toLocaleString()}`:'';
     const imgH=cardImg(p.image,true);
     const tags=(p.tags||[]).join(', ')||'—';
     const date=new Date(p.createdAt).toLocaleDateString('zh-TW');
+
     return `<div class="cmp-col">
       ${imgH}
       <div class="cmp-col-body">
@@ -613,13 +579,20 @@ function openCompareView(){
         <div class="cmp-col-name">${esc(p.name)}</div>
         <div class="cmp-col-price">${p.price!=null?`${sym}${Number(p.price).toLocaleString()} <span style="font-size:11px;font-weight:400;color:var(--ink3)">${cur}</span>`:'—'}</div>
         <div class="cmp-col-hkd">${hkdLine}</div>
+        
+        ${ratio ? `<div class="cmp-row">
+          <div class="cmp-row-label">購買力對比</div>
+          <div class="cmp-row-val" style="color:var(--accent);font-weight:600">1 件 ≈ ${ratio} 件</div>
+        </div>` : ''}
+
         <div class="cmp-row"><div class="cmp-row-label">標籤</div><div class="cmp-row-val">${esc(tags)}</div></div>
         <div class="cmp-row"><div class="cmp-row-label">記錄日</div><div class="cmp-row-val">${date}</div></div>
         ${p.note?`<div class="cmp-row"><div class="cmp-row-label">備註</div><div class="cmp-row-val">${esc(p.note)}</div></div>`:''}
       </div>
     </div>`;
   };
-  document.getElementById('compareContent').innerHTML=`<div class="cmp-cols">${col(p1,h1!=null&&h2!=null&&h1<=h2)}${col(p2,h1!=null&&h2!=null&&h2<=h1)}</div>`;
+
+  document.getElementById('compareContent').innerHTML=`<div class="cmp-cols">${col(p1,h1!=null&&h2!=null&&h1<=h2, buyRatio1)}${col(p2,h1!=null&&h2!=null&&h2<=h1, buyRatio2)}</div>`;
   openModal('compareModal');
 }
 
