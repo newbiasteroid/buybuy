@@ -235,6 +235,7 @@
             <option value="JPY">JPY</option>
             <option value="TWD">TWD</option>
             <option value="USD">USD</option>
+            <option value="CNY">CNY</option>
           </select>
         </div>
       </div>
@@ -302,8 +303,8 @@
 <script>
 const STORAGE_KEY = 'buybuy_v2';
 const MAX_PX = 800, MAX_Q = 0.75;
-const TO_HKD = {HKD:1,JPY:0.051,TWD:0.24,USD:7.78};
-const SYM = {HKD:'HK$',JPY:'¥',TWD:'NT$',USD:'US$'};
+const TO_HKD = {HKD:1,JPY:0.051,TWD:0.24,USD:7.78,CNY:1.07};
+const SYM = {HKD:'HK$',JPY:'¥',TWD:'NT$',USD:'US$',CNY:'¥'};
 const EMOJIS = ['📦','👟','👗','👜','💄','📱','💻','🎧','📷','🎮','🏠','🛋️','🍳','📚','✏️','🎸','🏋️','🚴','✈️','🌸','💍','⌚','🕶️','🎒','🧴','🪴','🧸','🎁','💡','🔧'];
 
 let products=[], currentTags=[], currentImage=null, compareMode=false, compareItems=[null,null];
